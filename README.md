@@ -1,260 +1,270 @@
-# UTS Web Service Engineering - Members API
+Praktikum 7 - Hardening RESTful API
+Identitas Mahasiswa
 
-## Identitas Mahasiswa
-- **Nama:** Helma Afifah
-- **NIM:** 230104040215
-- **Kelas:** TI23A
-- **Digit Akhir NIM:** 5
-- **Resource:** Members (Data Anggota Organisasi)
+Nama: Helma Afifah
+NIM: 230104040215
+Kelas: TI23A
+Mata Kuliah: Web Service Engineering
+Topik: Meningkatkan Keamanan, Logging, dan Monitoring pada RESTful API
 
-## Deskripsi Project
-RESTful API untuk mengelola data anggota organisasi dengan operasi CRUD lengkap menggunakan Express.js.
+Deskripsi Project
+Praktikum ini merupakan kelanjutan dari UTS. API Members yang telah dibuat sebelumnya diperkuat (hardening) dengan menambahkan:
 
-## Field Data Members
-- `id` (number) - ID unik member
-- `name` (string) - Nama lengkap member
-- `role` (string) - Peran dalam organisasi
-- `joinedAt` (string) - Tanggal bergabung (format: YYYY-MM-DD)
+Lapisan keamanan (Helmet, CORS, Rate Limiting)
+Logging & monitoring request (Morgan)
+Global error handling
+Environment variable configuration (.env)
+Health check dan metrics endpoint
 
-## Teknologi yang Digunakan
-- Node.js
-- Express.js
-- Nodemon (development)
+Teknologi yang Digunakan
 
-## Cara Instalasi
+Runtime: Node.js
+Framework: Express.js
+Security:
 
-1. Clone atau download project ini
-2. Install dependencies:
-```bash
-npm install
-```
+helmet - Security headers
+cors - Cross-Origin Resource Sharing
+express-rate-limit - Rate limiting
 
-3. Jalankan server:
-```bash
-npm run dev
-```
 
-Server akan berjalan di `http://localhost:3000`
+Logging: morgan - HTTP request logger
+Configuration: dotenv - Environment variables
 
-## Endpoint API
+Struktur Folder
+P7-Hardening-230104040215/
+├── controllers/
+│   └── memberController.js
+├── data/
+│   └── members.js
+├── routes/
+│   └── memberRoutes.js
+├── middlewares/
+│   └── errorHandler.js
+├── logs/
+│   └── access.log (auto-generated)
+├── .env
+├── .env.example
+├── .gitignore
+├── app.js
+├── package.json
+└── README.md
+Cara Instalasi
 
-### 1. API Info
-```
-GET /api/info
-```
-Menampilkan informasi API dan identitas mahasiswa.
+Clone atau download project ini
+Copy .env.example menjadi .env:
 
-**Response (200):**
-```json
-{
+bashcopy .env.example .env
+
+Install dependencies:
+
+bashnpm install
+
+Jalankan server:
+
+bashnpm run dev
+Server akan berjalan di http://localhost:3000
+Environment Variables
+File .env berisi konfigurasi:
+bashPORT=3000
+NODE_ENV=development
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+ALLOWED_ORIGINS=http://localhost:3000
+API_VERSION=1.0.0
+API_NAME=Members API - Hardened
+Penjelasan:
+
+PORT: Port server (default: 3000)
+NODE_ENV: Environment mode (development/production)
+RATE_LIMIT_WINDOW_MS: Window time untuk rate limit (15 menit = 900000 ms)
+RATE_LIMIT_MAX_REQUESTS: Maksimal request per window (100 requests)
+ALLOWED_ORIGINS: Domain yang diizinkan akses API
+API_VERSION: Versi API
+API_NAME: Nama API
+
+Endpoint API
+1. Health Check
+GET /api/health
+Mengecek status kesehatan service.
+Response (200):
+json{
   "status": "success",
-  "message": "RESTful API Members - UTS Web Service Engineering",
+  "message": "Service is healthy",
+  "uptime": 123.456,
+  "timestamp": "2025-11-24T10:00:00.000Z",
+  "environment": "development"
+}
+2. Metrics
+GET /api/metrics
+Menampilkan metrics aplikasi.
+Response (200):
+json{
+  "status": "success",
+  "data": {
+    "totalRequests": 150,
+    "uptime": 123.456,
+    "memoryUsage": {...},
+    "timestamp": "2025-11-24T10:00:00.000Z"
+  }
+}
+3. API Info
+GET /api/info
+Menampilkan informasi lengkap API dan konfigurasi security.
+Response (200):
+json{
+  "status": "success",
+  "message": "RESTful API Members - Hardened Version",
+  "version": "1.0.0",
   "student": {
     "name": "Helma Afifah",
     "nim": "230104040215",
     "class": "TI23A"
   },
-  "endpoints": { ... }
-}
-```
-
-### 2. Get All Members
-```
-GET /api/members
-```
-Mengambil semua data members.
-
-**Response (200):**
-```json
-{
-  "status": "success",
-  "data": [...]
-}
-```
-
-### 3. Get Member by ID
-```
-GET /api/members/:id
-```
-Mengambil data member berdasarkan ID.
-
-**Response (200):**
-```json
-{
-  "status": "success",
-  "data": {
-    "id": 1,
-    "name": "Budi Santoso",
-    "role": "Chairman",
-    "joinedAt": "2024-01-15"
+  "endpoints": {...},
+  "security": {
+    "helmet": "enabled",
+    "cors": "enabled",
+    "rateLimit": "100 requests per 15 minutes"
   }
 }
-```
-
-**Response (404):**
-```json
-{
-  "status": "fail",
-  "message": "Member tidak ditemukan"
-}
-```
-
-### 4. Create New Member
-```
+4. Get All Members
+GET /api/members
+5. Get Member by ID
+GET /api/members/:id
+6. Create Member
 POST /api/members
-```
-Menambah member baru.
-
-**Request Body:**
-```json
-{
+Request Body:
+json{
   "name": "Helma Afifah",
   "role": "Member",
-  "joinedAt": "2024-11-10"
+  "joinedAt": "2024-11-24"
 }
-```
-
-**Response (201):**
-```json
-{
-  "status": "success",
-  "data": {
-    "id": 4,
-    "name": "Helma Afifah",
-    "role": "Member",
-    "joinedAt": "2024-11-10"
-  }
-}
-```
-
-**Response (400) - Validasi Error:**
-```json
-{
-  "status": "fail",
-  "message": "Field 'name' wajib diisi"
-}
-```
-
-### 5. Update Member
-```
+7. Update Member
 PUT /api/members/:id
-```
-Mengupdate data member berdasarkan ID.
-
-**Request Body:**
-```json
-{
-  "name": "Budi Santoso Updated",
-  "role": "Vice Chairman",
-  "joinedAt": "2024-01-15"
-}
-```
-
-**Response (200):**
-```json
-{
-  "status": "success",
-  "data": {
-    "id": 1,
-    "name": "Budi Santoso Updated",
-    "role": "Vice Chairman",
-    "joinedAt": "2024-01-15"
-  }
-}
-```
-
-**Response (404):**
-```json
-{
-  "status": "fail",
-  "message": "Member tidak ditemukan"
-}
-```
-
-**Response (400) - Validasi Error:**
-```json
-{
-  "status": "fail",
-  "message": "Field 'name' wajib diisi"
-}
-```
-
-### 6. Delete Member
-```
+8. Delete Member
 DELETE /api/members/:id
-```
-Menghapus member berdasarkan ID.
+Fitur Keamanan
+1. Helmet
+Mengatur security headers HTTP untuk melindungi dari serangan umum:
 
-**Response (204):**
-No content (berhasil dihapus)
+X-Content-Type-Options
+X-Frame-Options
+Strict-Transport-Security
+X-XSS-Protection
 
-**Response (404):**
-```json
-{
-  "status": "fail",
-  "message": "Member tidak ditemukan"
+2. CORS (Cross-Origin Resource Sharing)
+Membatasi akses API hanya dari origin yang diizinkan:
+javascriptALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
+3. Rate Limiting
+Membatasi jumlah request untuk mencegah abuse dan DDoS:
+
+Window: 15 menit (900000 ms)
+Max Requests: 100 per window per IP
+
+Response jika limit terlampaui (429):
+json{
+  "status": "error",
+  "message": "Too many requests from this IP, please try again later."
 }
-```
+Logging
+Morgan Logger
+Setiap HTTP request akan dicatat ke:
 
-## Status Code yang Digunakan
-- **200** - OK (berhasil mengambil/mengupdate data)
-- **201** - Created (berhasil menambah data baru)
-- **204** - No Content (berhasil menghapus data)
-- **400** - Bad Request (validasi error)
-- **404** - Not Found (data tidak ditemukan)
-- **500** - Internal Server Error
+Console (format: dev) - untuk monitoring realtime
+File logs/access.log (format: combined) - untuk audit trail
 
-## 7 Prinsip RESTful yang Diterapkan
+Format Log:
+::1 - - [24/Nov/2025:10:00:00 +0000] "GET /api/members HTTP/1.1" 200 245
+Error Handling
+Global Error Handler
+Semua error akan ditangani secara konsisten oleh middleware errorHandler.js.
+Response Error Format:
+json{
+  "status": "error",
+  "statusCode": 500,
+  "message": "Error message here",
+  "stack": "... (only in development mode)"
+}
+404 Not Found
+Endpoint yang tidak ditemukan akan mengembalikan:
+json{
+  "status": "error",
+  "message": "Endpoint not found"
+}
+Status Code yang Digunakan
 
-### 1. Resource-Oriented URI
-✅ Menggunakan kata benda jamak: `/api/members`
+200 - OK
+201 - Created
+204 - No Content
+400 - Bad Request (validasi error)
+404 - Not Found
+429 - Too Many Requests (rate limit)
+500 - Internal Server Error
 
-### 2. Proper HTTP Methods
-✅ GET, POST, PUT, DELETE sesuai operasi CRUD
+Testing dengan Postman
+Daftar Endpoint untuk Testing (9 Screenshot):
 
-### 3. Stateless Communication
-✅ Tidak ada session atau state di server, setiap request mandiri
+GET /api/health - Health check
+GET /api/metrics - Metrics
+GET /api/info - API information
+GET /api/members - Get all members
+GET /api/members/:id - Get member by ID
+POST /api/members - Create new member
+PUT /api/members/:id - Update member
+DELETE /api/members/:id - Delete member
+GET /api/members (dengan banyak request) - Test rate limiting
 
-### 4. Consistent Status Codes
-✅ Menggunakan status code standar: 200, 201, 204, 400, 404
+Cara Test Rate Limiting:
 
-### 5. JSON Representation
-✅ Semua response dalam format JSON yang konsisten
+Buat request ke /api/members
+Kirim request berkali-kali dengan cepat (lebih dari 100x dalam 15 menit)
+Setelah limit terlampaui, akan muncul response 429
 
-### 6. Validation & Error Handling
-✅ Validasi field wajib dengan pesan error yang jelas
+Monitoring
+File Log
+Semua request HTTP akan dicatat di file logs/access.log.
+Contoh isi log:
+::1 - - [24/Nov/2025:10:15:30 +0000] "GET /api/members HTTP/1.1" 200 156
+::1 - - [24/Nov/2025:10:15:35 +0000] "POST /api/members HTTP/1.1" 201 89
+::1 - - [24/Nov/2025:10:15:40 +0000] "GET /api/health HTTP/1.1" 200 112
+Console Output
+Server akan menampilkan informasi startup:
+================================================
+🚀 Server running on http://localhost:3000
+📊 Environment: development
+🛡️  Security: Helmet, CORS, Rate Limit enabled
+📝 Logging: Morgan enabled (access.log)
+================================================
+📌 API Info: http://localhost:3000/api/info
+💚 Health Check: http://localhost:3000/api/health
+📈 Metrics: http://localhost:3000/api/metrics
+================================================
+Perbandingan dengan Versi UTS
+AspekUTS (Basic)Praktikum 7 (Hardened)Security Headers❌✅ HelmetCORS Protection❌✅ ConfiguredRate Limiting❌✅ 100 req/15minRequest Logging❌✅ MorganError HandlingBasic✅ Global HandlerEnvironment ConfigHardcoded✅ .envHealth Check❌✅ /api/healthMetrics❌✅ /api/metricsProduction Ready❌✅ Yes
+Checklist Praktikum 7
 
-### 7. Discoverability
-✅ Endpoint `/api/info` sebagai metadata dan dokumentasi service
+✅ Helmet security headers aktif
+✅ CORS dengan origin restriction
+✅ Rate limiting (100 req/15min)
+✅ Morgan logging ke file dan console
+✅ Global error handler
+✅ Environment variables (.env)
+✅ Health check endpoint
+✅ Metrics endpoint
+✅ Struktur folder modular
+✅ Dokumentasi lengkap
 
-## Struktur Folder
-```
-UTS-WSE-230104040215/
-├── app.js                      # Entry point aplikasi
-├── package.json                # Dependencies dan scripts
-├── routes/
-│   └── memberRoutes.js         # Definisi routing
-├── controllers/
-│   └── memberController.js     # Business logic CRUD
-└── data/
-    └── members.js              # Data dummy members
-```
+Kesimpulan
+API Members telah berhasil di-hardening dengan penambahan:
 
-## Testing
-Gunakan Postman untuk testing semua endpoint dengan koleksi request yang telah disediakan di atas.
+Security Layer - Helmet, CORS, Rate Limiting
+Observability - Logging dengan Morgan
+Monitoring - Health check dan metrics
+Error Handling - Global error handler
+Configuration Management - Environment variables
 
-## Checklist Pengerjaan
-- ✅ CRUD lengkap berjalan
-- ✅ Validasi input & error handling
-- ✅ Status code konsisten
-- ✅ Response JSON rapi
-- ✅ Endpoint /api/info aktif
-- ✅ Struktur folder sesuai template
-- ✅ Screenshot hasil uji CRUD
-- ✅ Penerapan 7 RESTful Principles
+API ini sekarang siap untuk production-level deployment dengan standar keamanan dan monitoring yang baik.
 
----
-
-**Dikerjakan oleh:**  
-Helma Afifah - 230104040215 - TI23A  
-Web Service Engineering - UTS Semester Ganjil 20251
+Dikerjakan oleh:
+Helma Afifah - 230104040215 - TI23A
+Web Service Engineering - Praktikum 7 - Semester Ganjil 20251
