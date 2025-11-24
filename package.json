@@ -1,0 +1,24 @@
+{
+  "name": "p7-hardening-230104040215",
+  "version": "1.0.0",
+  "description": "Praktikum 7 - Hardening RESTful API - Helma Afifah",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "keywords": ["rest", "api", "express", "security", "hardening"],
+  "author": "Helma Afifah - 230104040215",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "helmet": "^7.1.0",
+    "cors": "^2.8.5",
+    "express-rate-limit": "^7.1.5",
+    "dotenv": "^16.3.1",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
